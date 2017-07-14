@@ -348,6 +348,15 @@ function ApiCache() {
       all: [],
       groups: {}
     }
+    if (globalOptions.redisClient) {
+      //extra search for clearing redis by wildcard. not optimal at all, it's a fix...
+      globalOptions.redisClient.keys('apicache/*', function (err, rows) {
+        for (var i = 0, j = rows.length; i < j; ++i) {
+          debug('Removing ' + rows[i]);
+          globalOptions.redisClient.del(rows[i])
+        }
+      });
+    }
   }
 
   this.newInstance = function(config) {
